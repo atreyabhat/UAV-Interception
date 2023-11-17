@@ -73,6 +73,79 @@ tspan = [0 10];
 %% Solve system from every initial state
 [t, z] = ode45( @(t, z) dz(t, z, u(z, zd, ud, K)), tspan, z0);
 
+%% Plotting error Norm curve
+% Initialize variables to store error and norm
+error_vector = zeros(size(z));
+error_norm = zeros(size(z, 1), 1);
+
+% Compute the error and norm at each time step
+for i = 1:size(z, 1)
+    error_vector(i, :) = z(i, 1:12) - zd';
+    error_norm(i) = norm(error_vector(i, :), 2);
+end
+
+% Plot the error norm curve
+figure;
+plot(t, error_norm, '-x');
+title('Error Norm Curve');
+xlabel('Time (s)');
+ylabel('L2 Norm of Error');
+grid on;
+
+%% State Trajectory
+figure;
+plot(t, z(:, 1:6), 'LineWidth', 2);  % Actual state trajectories
+hold on;
+plot(t, repmat(zd(1:6)', size(z, 1), 1), '--', 'LineWidth', 2);  % Desired state trajectories
+title('State Trajectories');
+xlabel('Time (s)');
+ylabel('State Value');
+legend('Actual', 'Desired');
+grid on;
+
+%% Eigen Value Plot
+
+closed_loop_matrix = A - B * K;
+eigenvalues = eig(closed_loop_matrix);
+figure;
+plot(real(eigenvalues), imag(eigenvalues), 'x');
+title('Eigenvalue Plot');
+xlabel('Real Part');
+ylabel('Imaginary Part');
+grid on;
+
+%% Control input plots
+%Plot the control inputs
+figure;
+hold on;
+for i = 1:size(K, 1)
+    plot(t, u(z.', zd,ud, K(i, :)), 'LineWidth', 2, 'DisplayName', sprintf('Control Input %d', i));
+end
+hold off;
+
+title('Control Inputs Over Time');
+xlabel('Time (s)');
+ylabel('Control Input');
+legend('show');
+grid on;
+
+% % Initialize matrix to store control inputs
+% control_inputs = zeros(length(t), size(K, 1));
+% 
+% % Compute and store control inputs
+% for i = 1:size(K, 4)
+%     control_inputs(:, :,:,i) = u(z.', zd, ud, K(i, :)).';
+% end
+% 
+% % Plot the individual control inputs
+% figure;
+% plot(t, control_inputs, 'LineWidth', 2);
+% title('Control Inputs Over Time');
+% xlabel('Time (s)');
+% ylabel('Control Input');
+% legend('Control Input 1', 'Control Input 2', 'Control Input 3', 'Control Input 4');
+grid on;
+
 %% Init. 3D Fig.
 fig1 = figure('pos',[0 200 800 800]);
 h = gca;
@@ -113,6 +186,42 @@ quadTrace = plot3(gca, 4, 4, 5, '-', 'Color', quadrotorColor);
 
 % hold(gca, 'off');
 
+%% Plot the position and velocity
+% Extract position and velocity components from the state vector
+position = z(:, 1:3);
+velocity = z(:, 4:6);
+
+% Plot the position over time
+figure;
+subplot(2, 1, 1);
+plot(t, position, 'LineWidth', 2);
+title('Quadrotor Position Over Time');
+xlabel('Time (s)');
+ylabel('Position');
+legend('X', 'Y', 'Z');
+grid on;
+
+% Plot the velocity over time
+subplot(2, 1, 2);
+plot(t, velocity, 'LineWidth', 2);
+title('Quadrotor Velocity Over Time');
+xlabel('Time (s)');
+ylabel('Velocity');
+legend('Vx', 'Vy', 'Vz');
+grid on;
+
+% Extract displacement components from the state vector
+displacement = z(:, 1:3);
+
+% Plot the displacement over time
+figure;
+plot(t, displacement, 'LineWidth', 2);
+title('Quadrotor Displacement Over Time');
+xlabel('Time (s)');
+ylabel('Displacement');
+legend('X', 'Y', 'Z');
+grid on;
+
 
 %% Animate
 
@@ -139,13 +248,3 @@ for k=1:length(t)
     
     pause(0.1);
 end
-
-
-
-
-
-
-
-
-
-
