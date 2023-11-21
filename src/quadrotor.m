@@ -46,17 +46,19 @@ u = @(z, zd, ud, K) ud + K*(zd - z);
 
 %% Controller setup/cost
 
-Q = diag([2, 2, 2, 1, 1, 1,1,1,1,1,1,1]);  % State cost
+Q = diag([20, 20, 20, 1, 1, 1,1,1,1,1,1,1]);  % State cost
 R = eye(4);  % Control cost
 [K, ~, ~] = lqr(A, B, Q, R);
 
 %% Initial Conditions
-z0 = [4; 4; 5; 0; 0; 0; 0; 0; 0; 0; 0; 0];
+z0 = [0; 0; 0; 0; 0; 0; 0; 0; 0; 0; 0; 0];
 % u = [1,1,1,1] *m*g/4;
 
 %% Desired states
-zd = [0; 0; 1; 0; 0; 0; 0; 0; 0; 0; 0; 0];
+zd = [0; 0; 2; 0; 0; 0; 0; 0; 0; 0; 0; 0];
 ud = zeros(4, 1);
+
+
 
 
 %% Drone Body
@@ -71,6 +73,31 @@ drone_body = [ 0.265,      0,     0, 1; ...
 
 tspan = [0 10];
 %% Solve system from every initial state
+
+%% Define the UAV trajectory function
+scale = rand(3, 1)*5; % Generate random multipliers for x, y, and z axes
+uav_trajectory = @(t, z) [scale(1)*sin(3*t); -scale(2)*cos(2*t); scale(3)*cos(5*t); 0; 0; 0; 0; 0; 0; 0; 0; 0];
+%scale = 0.001;
+%uav_trajectory = @(t, z) [scale*t.^3; scale*sin(t); scale*cos(t); zeros(9, length(t))];
+
+% Update the drone equations to include the UAV trajectory
+dz = @(t, z, u) A*z + B*u + uav_trajectory(t, z);
+
+% Initialize initial conditions for the UAV trajectory
+z0 = [0; 0; 0; 0; 0; 0; 0; 0; 0; 0; 0; 0];
+
+
+% Solve the system using the updated drone equations
+[t, z] = ode45(@(t, z) dz(t, z, u(z, zd, ud, K)), tspan, z0);
+
+% Plotting the UAV trajectory
+figure;
+plot3(z(:, 1), z(:, 2), z(:, 3), 'LineWidth', 2); % UAV trajectory in 3D
+title('UAV Trajectory');
+xlabel('X-axis');
+ylabel('Y-axis');
+zlabel('Z-axis');
+grid on;
 [t, z] = ode45( @(t, z) dz(t, z, u(z, zd, ud, K)), tspan, z0);
 
 %% Plotting error Norm curve
@@ -104,30 +131,30 @@ legend('Actual', 'Desired');
 grid on;
 
 %% Eigen Value Plot
-
-closed_loop_matrix = A - B * K;
-eigenvalues = eig(closed_loop_matrix);
-figure;
-plot(real(eigenvalues), imag(eigenvalues), 'x');
-title('Eigenvalue Plot');
-xlabel('Real Part');
-ylabel('Imaginary Part');
-grid on;
-
-%% Control input plots
-%Plot the control inputs
-figure;
-hold on;
-for i = 1:size(K, 1)
-    plot(t, u(z.', zd,ud, K(i, :)), 'LineWidth', 2, 'DisplayName', sprintf('Control Input %d', i));
-end
-hold off;
-
-title('Control Inputs Over Time');
-xlabel('Time (s)');
-ylabel('Control Input');
-legend('show');
-grid on;
+% 
+% closed_loop_matrix = A - B * K;
+% eigenvalues = eig(closed_loop_matrix);
+% figure;
+% plot(real(eigenvalues), imag(eigenvalues), 'x');
+% title('Eigenvalue Plot');
+% xlabel('Real Part');
+% ylabel('Imaginary Part');
+% grid on;
+% 
+% %% Control input plots
+% %Plot the control inputs
+% figure;
+% hold on;
+% for i = 1:size(K, 1)
+%     plot(t, u(z.', zd,ud, K(i, :)), 'LineWidth', 2, 'DisplayName', sprintf('Control Input %d', i));
+% end
+% hold off;
+% 
+% title('Control Inputs Over Time');
+% xlabel('Time (s)');
+% ylabel('Control Input');
+% legend('show');
+% grid on;
 
 % % Initialize matrix to store control inputs
 % control_inputs = zeros(length(t), size(K, 1));
@@ -187,40 +214,40 @@ quadTrace = plot3(gca, 4, 4, 5, '-', 'Color', quadrotorColor);
 % hold(gca, 'off');
 
 %% Plot the position and velocity
-% Extract position and velocity components from the state vector
-position = z(:, 1:3);
-velocity = z(:, 4:6);
-
-% Plot the position over time
-figure;
-subplot(2, 1, 1);
-plot(t, position, 'LineWidth', 2);
-title('Quadrotor Position Over Time');
-xlabel('Time (s)');
-ylabel('Position');
-legend('X', 'Y', 'Z');
-grid on;
-
-% Plot the velocity over time
-subplot(2, 1, 2);
-plot(t, velocity, 'LineWidth', 2);
-title('Quadrotor Velocity Over Time');
-xlabel('Time (s)');
-ylabel('Velocity');
-legend('Vx', 'Vy', 'Vz');
-grid on;
-
-% Extract displacement components from the state vector
-displacement = z(:, 1:3);
-
-% Plot the displacement over time
-figure;
-plot(t, displacement, 'LineWidth', 2);
-title('Quadrotor Displacement Over Time');
-xlabel('Time (s)');
-ylabel('Displacement');
-legend('X', 'Y', 'Z');
-grid on;
+% % Extract position and velocity components from the state vector
+% position = z(:, 1:3);
+% velocity = z(:, 4:6);
+% 
+% % Plot the position over time
+% figure;
+% subplot(2, 1, 1);
+% plot(t, position, 'LineWidth', 2);
+% title('Quadrotor Position Over Time');
+% xlabel('Time (s)');
+% ylabel('Position');
+% legend('X', 'Y', 'Z');
+% grid on;
+% 
+% % Plot the velocity over time
+% subplot(2, 1, 2);
+% plot(t, velocity, 'LineWidth', 2);
+% title('Quadrotor Velocity Over Time');
+% xlabel('Time (s)');
+% ylabel('Velocity');
+% legend('Vx', 'Vy', 'Vz');
+% grid on;
+% 
+% % Extract displacement components from the state vector
+% displacement = z(:, 1:3);
+% 
+% % Plot the displacement over time
+% figure;
+% plot(t, displacement, 'LineWidth', 2);
+% title('Quadrotor Displacement Over Time');
+% xlabel('Time (s)');
+% ylabel('Displacement');
+% legend('X', 'Y', 'Z');
+% grid on;
 
 
 %% Animate
