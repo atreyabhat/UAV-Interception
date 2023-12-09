@@ -1,4 +1,4 @@
-function dz = quadrotor(t, z, u, p, r, n)
+function dz = quadrotor(t, z, u, p, r, n, xd)
 % State vector definition
 %
 %      x1, x2, x3, phi, theta, psi, dx1, dx2, dx3, omega1, omega2, omega3
@@ -23,8 +23,8 @@ R = [ cos(z(5))*cos(z(6)), sin(z(4))*sin(z(5))*cos(z(6)) - cos(z(4))*sin(z(6)), 
 
 % Adjusting thrust output based on feasible limits
 u = max( min(u, p(7)), 0);
-
-
+% disp(xd);
+err = xd - z(1:3);
 % Computing temporrary variables
 
 % rt = torque vector induced by rotor thrusts
@@ -42,4 +42,6 @@ dz(4:6,1) = [ z(10) + z(12)*cos(z(4))*tan(z(5)) + z(11)*sin(z(4))*tan(z(5));
                       
 dz(7:9,1) = R*([0; 0; sum(u)] + r)/p(3) - [0; 0; p(1)];
 
-dz(10:12,1) = I\( rt + n - cross( z(10:12,1) , I * z(10:12,1) ) );
+dz(10:12,1) = I\ R*( rt + n - cross( z(10:12,1) , I * z(10:12,1) ) );
+
+dz(13:15) = err;
