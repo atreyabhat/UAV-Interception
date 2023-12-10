@@ -1,4 +1,4 @@
-function [A B] = getAB()
+clc; close all; clear;
 %% Define symbolic variables
 syms x1 x2 x3 vx vy vz phi theta psi wx wy wz er1 er2 er3 x1d x2d x3d
 z = [x1; x2; x3; phi; theta; psi; vx; vy; vz; wx; wy; wz; er1; er2; er3];
@@ -47,23 +47,23 @@ A = subs(A,{vx,vy, vz, phi, theta, psi, wx, wy, wz, u1, u2, u3, u4, r1, r2, r3, 
 B = jacobian(z_dot, u);
 B = subs(B,{vx,vy, vz, phi, theta, psi, wx, wy, wz, u1, u2, u3, u4, r1, r2, r3, n1, n2, n3}, {0,0,0,0,0,0,0,0,0,m*g/4,m*g/4,m*g/4,m*g/4,0,0,0,0,0,0});
 
-% disp (A);
-% disp (B);
-% 
-% %% Check Controllability
-% n = size(A, 1);
-% m = size(B, 2);
-% C = B;
-% for i = 1:n-1
-%     C = [C, A^i * B];
-% end
-% 
-% rank_C = rank(C);
-% disp("Rank of controllability matrix C is:");
-% disp(rank_C);
-% 
-% if rank_C == n
-%     disp("The system is controllable.");
-% else
-%     disp("The system is not fully controllable.");
-% end
+disp (A);
+disp (B);
+
+%% Check Controllability
+n = size(A, 1);
+m = size(B, 2);
+C = B;
+for i = 1:n-1
+    C = [C, A^i * B];
+end
+
+rank_C = rank(C);
+disp("Rank of controllability matrix C is:");
+disp(rank_C);
+
+if rank_C == n
+    disp("The system is controllable.");
+else
+    disp("The system is not fully controllable.");
+end
