@@ -22,28 +22,13 @@ The primary goal of this project is to develop a control system for a quadrotor 
 
 
 
+![Quadrotor Control Methodology](https://github.com/atreyabhat/RBE502_UAV_Interceptor/assets/39030188/3bc0685c-43b1-4af6-a5eb-544e3068713d)
 
-# LQR-based UAV Interception
-
-![Quadrotor Control Methodology](https://link-to-your-image-here/quadrotor_methodology.jpg)
-
-## Introduction
-
-This project focuses on Quadrotor Control methodologies for intercepting unauthorized UAVs, utilizing Linear Quadratic Regulation (LQR) for precision tracking and interception. The objective is to monitor a restricted airspace, with the quadrotor designed to fly, intercept, and return unauthorized UAVs. Assumptions include a central nest, a 10x10x10 meters airspace, and an intruding UAV entering at time $t_{0}=0$. The project aims to minimize errors between actual and desired positions, considering external disturbances.
-
-## Methodology
-
-### Controller Design
-
-#### System Modeling
-
-The quadrotor's dynamics are represented by state variables $x$, Euler angles $\alpha$, velocity $v$, and angular velocity $\omega$. The linearized dynamics are captured in Jacobian matrices A and B. The state-space representation and control law are defined as:
-\[ \dot{x} = Ax + Bu \]
-\[ K = R^{-1} (B^T S + N^T) \]
 
 #### LQR Control Design
 
 The cost function $J$ is minimized, incorporating state and control penalties. The controller design involves tuning Q and R matrices. The Kalman filter is employed for state estimation, enhancing pursuit efficiency.
+
 
 ### Simulation Results
 
@@ -63,7 +48,5 @@ To nullify steady-state error, integral action is applied. This mitigates error 
 ![Steady State Error](https://github.com/atreyabhat/RBE502_UAV_Interceptor/assets/39030188/4c39762c-174f-4213-86e6-795e8c103b58)
 ![UAV and Quadrotor Trajectories](https://github.com/atreyabhat/RBE502_UAV_Interceptor/assets/39030188/572e053c-387f-4394-a0c4-c230254d1877)
 
-## Conclusions
 
-This project explored the control methodology for quadrotor interception, emphasizing LQR design. While effective, the controller exhibits limitations in scenarios involving abrupt changes and external disturbances. The addition of Proportional-Integral gain (LQR-PI) reduces steady-state error, enhancing robustness.
 
