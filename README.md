@@ -15,7 +15,6 @@ The primary goal of this project is to develop a control system for a quadrotor 
 3. **Return to the Nest:** Safely return with the captured UAV.
 
 ## Assumptions
-Several assumptions have been made to facilitate this project:
 - **Nest Location:** The nest is positioned at the center of the bottom surface, serving as the origin of the airspace.
 - **Airspace Dimensions:** The airspace measures 10x10x10 meters.
 - **UAV Entry Time:** The intruding UAV enters the airspace at time t0 = 0.
